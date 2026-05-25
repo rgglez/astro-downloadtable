@@ -1,0 +1,82 @@
+---
+/*
+ * Copyright 2026 Rodolfo González González
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+interface Props {
+  filename: string;
+}
+
+const { filename, label } = Astro.props;
+---
+
+<div data-download-table data-filename={filename}>
+  <slot />
+  <button
+    type="button"
+    data-download-btn
+    class="mt-2 inline-flex cursor-pointer items-center gap-2 rounded border border-border bg-muted/60 px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-muted hover:text-accent focus-visible:outline-2 focus-visible:outline-dashed focus-visible:outline-accent"
+    aria-label="Descargar tabla"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-4 w-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.75"
+      stroke="currentColor"
+      aria-hidden="true"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+    </svg>
+    {label || "Download table"}
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-download-table]").forEach(el => {
+    const btn = el.querySelector("[data-download-btn]");
+    const filename = el.dataset.filename ?? "tabla.csv";
+
+    btn?.addEventListener("click", () => {
+      const escape = (s: string) => `"${s.replace(/"/g, '""')}"`;
+      const rows: string[][] = [];
+
+      const headers = Array.from(el.querySelectorAll("thead th")).map(
+        th => th.textContent?.trim() ?? ""
+      );
+      if (headers.length) rows.push(headers);
+
+      el.querySelectorAll("tbody tr").forEach(tr => {
+        rows.push(
+          Array.from(tr.querySelectorAll("td")).map(
+            td => td.textContent?.trim() ?? ""
+          )
+        );
+      });
+
+      const csv = rows.map(r => r.map(escape).join(",")).join("\r\n") + "\r\n";
+      const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  });
+</script>
