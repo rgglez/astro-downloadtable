@@ -24,11 +24,11 @@ npm install @rgglez/astro-downloadtable
 
 ## Usage
 
-Import the component:
-
-```mdx
-import downloadtable from "@/components/downloadtable.astro";
+```javascript
+import DownloadTable from "@/components/downloadtable.astro";
 ```
+
+### Usage in `.mdx` files
 
 Wrap a checklist with the component in your MD/MDX files:
 
@@ -44,6 +44,39 @@ Wrap a checklist with the component in your MD/MDX files:
 
 Now, when you view the rendered MDX or Markdown in the browser, you'll see a
 download button. Clicking it will download the checklist in CSV format.
+
+### Usage in `.astro` files
+
+The component is not limited to MDX/Markdown. It also works in `.astro` pages,
+layouts, and other Astro components, as long as the slot contains a real HTML
+`<table>` with `<thead><th>` and `<tbody><td>`:
+
+```astro
+<DownloadTable filename="data.csv" label="Download CSV">
+  <table>
+    <thead>
+      <tr><th>Column A</th><th>Column B</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>2</td></tr>
+    </tbody>
+  </table>
+</DownloadTable>
+```
+
+### Requirements
+
+- The slot must contain an HTML `<table>` with `<thead><th>` headers and
+  `<tbody><td>` cells. The CSV is built by reading the rendered DOM, not the
+  source Markdown.
+- Works in `.astro`, `.md`, `.mdx`, layouts, pages, and other Astro components.
+
+### Limitations
+
+- Does not work inside React/Vue/Svelte/Solid islands — `.astro` components
+  cannot be embedded in framework components.
+- The CSV-building script runs once on page load. Tables injected into the DOM
+  later by client-side JavaScript will not be picked up.
 
 ### Properties
 
