@@ -1,6 +1,6 @@
 {
   "name": "@rgglez/astro-downloadtable",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Astro component that wraps a markdown table and adds a CSV download button.",
   "type": "module",
   "exports": {
